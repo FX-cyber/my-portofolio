@@ -219,3 +219,8 @@ main section[tabindex]:focus-visible{outline:none}
 .companion-data .companion-bubble,.companion-spark .companion-bubble{width:200px;max-width:calc(88vw - 76px);right:calc(100% + 10px);font-size:11px}
 }
 .pixel-companion .companion-bubble:empty{display:none!important}
+
+/* Speech tails point back to the character; retain the shared box styling. */
+.pixel-companion .companion-bubble:not(:empty)::after{content:'';display:block;position:absolute;right:-7px;left:auto;top:19px;bottom:auto;width:12px;height:12px;background:var(--panel);border:0;border-top:1px solid var(--line);border-right:1px solid var(--line);transform:rotate(45deg);box-shadow:none}
+.companion-byte .companion-bubble[data-tail="top"]:not(:empty)::after{top:-7px;left:var(--tail-x,50%);right:auto;transform:rotate(-45deg)}
+.profile-card-bottom{margin-top:24px}

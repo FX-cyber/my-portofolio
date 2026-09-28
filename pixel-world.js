@@ -27,9 +27,9 @@
     }
   }
   const specs=[
-    {kind:'byte',host:'.hero',color:palettes[0],hint:'Klik untuk menyapa · bisa digeser',words:['anak sistem informasi, mainnya sama data. sesekali main juga lah.','tertarik data sama AI. kalau udah penasaran, tab browser langsung rame.','suka cari pola. kadang nemu insight, kadang malah nambah pertanyaan.','lihat angka dikit langsung penasaran. emang susah kalau udah kepo.','seneng bikin yang ribet jadi kebaca. cukup datanya aja yang rumit.','kenalan dulu gapapa. ini portofolio, bukan ruang sidang.']},
-    {kind:'data',host:'#projects',color:palettes[2],hint:'Klik untuk menyusun pixel · bisa digeser',words:['Insight Explorer: beresin data dulu. iya, bagian yang suka diskip itu.','Vision Intelligence bahas machine learning. namanya serius, tetep boleh kepo.','Data Storyboard bikin angka lebih kebaca. biar ga cuma oh keren terus bingung.','boleh diklik kartunya. ga bakal tiba-tiba disuruh presentasi kok.','grafiknya cakep. tapi artinya apa? nah itu baru pertanyaannya.','angka nol sama data kosong beda ya. jangan asal disamain, kasian.']},
-    {kind:'spark',host:'#achievements',color:palettes[1],hint:'Klik untuk percikan ide · bisa digeser',words:['di sini ada sertifikat IBM SkillsBuild dan Google Arcade. bukan hasil gacha warung.','klik sertifikat buat lihat lebih jelas. fitur zoom, bukan tes mata.','sertifikat jadi jejak belajar. ilmunya tetap perlu diajak keluar rumah.','judul sertifikat bisa mirip. detailnya tetap dibaca, jangan cuma percaya bingkai.','selesai satu materi, muncul pertanyaan baru. side quest tidak mengenal pensiun.','pencapaian kecil tetap dihitung. kecuali jumlah tab terbuka, itu panggil bantuan.']}
+    {kind:'byte',host:'.hero',color:palettes[0],hint:'Klik untuk menyapa · bisa digeser',words:['oh halo. nyari anak data? coba kenalan dulu.','sistem informasi. tertarik data sama AI. iya, masih belajar juga.','orangnya suka ngulik data. udah, biar proyeknya yang cerita.','boleh cek profil dulu. santai, ga ditanya balik kok.','kalau cocok, kabarin lewat kontak ya. masa pixel terus yang diajak ngobrol :(']},
+    {kind:'data',host:'#projects',color:palettes[2],hint:'Klik untuk menyusun pixel · bisa digeser',words:['nah, ini proyeknya. klik aja, ada detailnya.','analisis data, ML, sama visualisasi. mau lihat yang mana dulu?','cek tujuan sama tools-nya juga ya. jangan salfok animasinya doang.','bentar. grafik bagus belum tentu jawab pertanyaannya.','udah sampai sini, masa cuma lewat :( buka satu dulu lah.']},
+    {kind:'spark',host:'#achievements',color:palettes[1],hint:'Klik untuk percikan ide · bisa digeser',words:['ini hasil belajarnya. boleh dicek satu-satu.','ada IBM SkillsBuild sama Google Arcade. klik biar kebaca.','sertifikatnya serius. yang muter-muter ini emang gabut.','belum tamat belajarnya. emang ada tamatnya?','udah lihat proyek sama sertifikat? nah, tinggal kenalan.']}
   ];
   specs.forEach((spec,index)=>{
     const host=document.querySelector(spec.host);
@@ -79,6 +79,7 @@
         bubble.style.width=width+'px';
         bubble.style.left=(left-anchor.left)+'px';
         bubble.style.top=(anchor.height+12)+'px';
+        bubble.dataset.tail='top';bubble.style.setProperty('--tail-x',Math.max(16,Math.min(width-20,anchor.left+anchor.width/2-left))+'px');
       }else{
         // On stacked layouts, reserve a small dialogue pocket beside Byte.
         const pocket=document.querySelector('.byte-dialogue-pocket');
@@ -86,6 +87,7 @@
         bubble.style.width=rect.width+'px';
         bubble.style.left=(rect.left-anchor.left)+'px';
         bubble.style.top=(rect.top-anchor.top)+'px';
+        bubble.dataset.tail='right';
       }
     }
     if(spec.kind==='byte'){
@@ -100,7 +102,7 @@
       cancel();
       step++;
       button.dataset.reaction=String(step);
-      say(dropped ? {byte:step%2?'lah, pindah tempat tanpa briefing :(':'santai, ga lagi lomba estafet.',spark:'pindah tempat bukan pencapaian baru. belum ada sertifikatnya.',data:'geser pixel boleh. geser angka biar bagus jangan.'}[spec.kind] : (spec.kind==='byte' && document.body.classList.contains('music-dancing') && step%3===0 ? 'data, AI, terus joget. jadwalnya padat juga.' : spec.words[(step-1)%spec.words.length]));
+      say(dropped ? {byte:step%2?'eh. dipindah ke mana ini :(':'iya iya, geser dikit.',spark:'wih. jauh juga. balik dulu ah.',data:'lah. kartunya yang diklik, bukan diangkut pixelnya.'}[spec.kind] : (spec.kind==='byte' && document.body.classList.contains('music-dancing') && step%3===0 ? 'nah ada musik. dari tadi hening banget.' : spec.words[(step-1)%spec.words.length]));
       if(spec.kind==='byte'){
         effects.push(animate(button.querySelector('svg'),[{transform:'rotate(0)'},{transform:'translateY(-12px) rotate(-14deg)'},{transform:'rotate(12deg)'},{transform:'rotate(0)'}],{duration:650,easing:'ease-out'}));
         effects.push(animate(button.querySelector('.byte-eyes'),[{opacity:1},{opacity:0,offset:.4},{opacity:1}],{duration:500}));
@@ -165,8 +167,37 @@
       if(event.key==='Escape'){cancel();reset();wrap.classList.remove('is-speaking');}
     });
     button.addEventListener('blur',()=>{if(!drag){cancel();reset();}});
-    actors.push({reset:()=>{cancel();reset();}});
+    actors.push({
+      wrap,
+      speak:()=>{
+        step++;
+        say(spec.words[(step-1)%spec.words.length]);
+      },
+      reset:()=>{cancel();reset();}
+    });
   });
+  // One visible companion speaks after inactivity; never interrupt dialogs or another message.
+  let idleTimer, idleTurn=0;
+  function scheduleIdle(delay=11000){
+    clearTimeout(idleTimer);
+    if(document.hidden)return;
+    idleTimer=setTimeout(()=>{
+      if(!document.hidden && !paused && !document.querySelector('dialog[open],.pixel-transition.is-active,.is-speaking,.is-dragging')){
+        const headerBottom=document.querySelector('.nav').getBoundingClientRect().bottom;
+        const candidates=actors.filter(actor=>{
+          const r=actor.wrap.getBoundingClientRect();
+          return r.top>=headerBottom+12 && r.bottom<=innerHeight-12 && r.right>0 && r.left<innerWidth;
+        });
+        if(candidates.length)candidates[idleTurn++%candidates.length].speak();
+      }
+      scheduleIdle(26000);
+    },delay);
+  }
+  ['pointerdown','pointermove','keydown','scroll','touchstart'].forEach(event=>{
+    window.addEventListener(event,()=>scheduleIdle(),{passive:true});
+  });
+  document.addEventListener('visibilitychange',()=>scheduleIdle());
+  scheduleIdle();
   window.addEventListener('resize',()=>actors.forEach(actor=>actor.reset()));
   reduced.addEventListener('change',()=>actors.forEach(actor=>actor.reset()));
   document.querySelectorAll('.profile,.contact').forEach((section,index)=>{
@@ -308,6 +339,9 @@
   // Pause passive loops when the tab is hidden.
   document.addEventListener('visibilitychange',()=>document.body.classList.toggle('page-hidden',document.hidden));
 })();
+
+
+
 
 
 
