@@ -7,17 +7,18 @@
   grid.before(track);track.append(grid);
   const scene=document.createElement('div');scene.className='project-scroll-stage';
   track.prepend(scene);scene.append(grid);
+  track.style.height=(cards.length*100)+'svh';
   const controls=document.createElement('nav');controls.className='scene-controls';controls.setAttribute('aria-label','Pilih adegan proyek');
   const buttons=cards.map((card,index)=>{
     card.classList.add('scene-card');card.classList.remove('scroll-depth');
-    card.style.setProperty('--scene-color',['var(--blue)','var(--green)','var(--red)'][index]);
+    card.style.setProperty('--scene-color',['var(--blue)','var(--green)','var(--red)','var(--blue)'][index%4]);
     card.style.setProperty('--scene-index',index);
     const cta=document.createElement('span');cta.className='scene-cta';cta.textContent='BUKA DETAIL ↗';card.append(cta);
     const button=document.createElement('button');button.type='button';button.textContent='0'+(index+1);
     button.setAttribute('aria-label',card.dataset.title);button.addEventListener('click',()=>{
       const top=track.getBoundingClientRect().top+scrollY;
-      const distance=track.offsetHeight-scene.offsetHeight;
-      window.scrollTo({top:top-navHeight()+distance*(index/(cards.length-1)),behavior:reduced.matches?'instant':'smooth'});
+      const distance=Math.max(1,track.offsetHeight-scene.offsetHeight);
+      window.scrollTo({top:top-navHeight()+distance*(index/Math.max(1,cards.length-1)),behavior:reduced.matches?'instant':'smooth'});
     });
     controls.append(button);return button;
   });
@@ -40,16 +41,18 @@
     document.body.classList.toggle('scroll-scenes-off',off);
     document.documentElement.style.setProperty('--scene-top',navHeight()+'px');
     if(off){
-      cards.forEach(card=>{card.inert=false;card.removeAttribute('aria-hidden');card.style.removeProperty('--panel-y');card.style.removeProperty('--panel-scale');});
+      cards.forEach(card=>{card.inert=false;card.removeAttribute('aria-hidden');card.style.removeProperty('--panel-y');card.style.removeProperty('--panel-scale');card.style.removeProperty('--panel-tilt');});
       active=-1;return;
     }
     const rect=track.getBoundingClientRect();
-    const progress=clamp((navHeight()-rect.top)/(track.offsetHeight-scene.offsetHeight));
+    const progress=clamp((navHeight()-rect.top)/Math.max(1,track.offsetHeight-scene.offsetHeight));
     let current=0;
     cards.forEach((card,index)=>{
-      const start=index===0?0:(index===1?.19:.62);
-      const entrance=index===0?1:clamp((progress-start)/.19);
-      const next=index===2?0:clamp((progress-(index===0?.19:.62))/.19);
+      const segment=1/Math.max(1,cards.length-1);
+      const duration=segment*.45;
+      const start=(index-.55)*segment;
+      const entrance=index===0?1:clamp((progress-start)/duration);
+      const next=index===cards.length-1?0:clamp((progress-(index+.45)*segment)/duration);
       card.style.setProperty('--panel-y',((1-entrance)*110).toFixed(2)+'%');
       card.style.setProperty('--panel-scale',(1-next*.09).toFixed(3));
       card.style.setProperty('--panel-tilt',(-next*9).toFixed(2)+'deg');

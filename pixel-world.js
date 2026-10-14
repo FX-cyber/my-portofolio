@@ -26,6 +26,31 @@
       effect.finished.then(()=>bit.remove(),()=>bit.remove());
     }
   }
+  // Short synthesized robot chatter; unlocked by an actual visitor gesture.
+  let voiceContext, voiceReady=false, voiceNodes=[];
+  function unlockVoice(){
+    try{voiceContext ??= new AudioContext();voiceContext.resume().then(()=>{voiceReady=true;}).catch(()=>{});}catch{}
+  }
+  window.addEventListener('pointerdown',unlockVoice,{passive:true});
+  window.addEventListener('keydown',unlockVoice);
+  function stopVoice(){voiceNodes.forEach(node=>{try{node.stop();}catch{}});voiceNodes=[];}
+  function robotVoice(kind){
+    const sound=document.querySelector('#bgAudio');
+    if(!voiceReady || document.hidden || sound.muted || sound.volume===0 || voiceContext.state!=='running')return;
+    stopVoice();
+    const settings={byte:{base:240,notes:[1,1.3,1.1,1.5,1],pace:.105,type:'triangle'},data:{base:145,notes:[1,1,1.25,1, .85],pace:.13,type:'square'},spark:{base:490,notes:[1,1.5,1.2,1.8,1.4,2],pace:.075,type:'triangle'}}[kind];
+    settings.notes.forEach((note,index)=>{
+      const oscillator=voiceContext.createOscillator(),gain=voiceContext.createGain();
+      const start=voiceContext.currentTime+index*settings.pace,duration=settings.pace*.72;
+      oscillator.type=settings.type;oscillator.frequency.setValueAtTime(settings.base*note,start);
+      oscillator.frequency.exponentialRampToValueAtTime(settings.base*note*.78,start+duration);
+      gain.gain.setValueAtTime(0,start);gain.gain.linearRampToValueAtTime(sound.volume*.13,start+.008);gain.gain.exponentialRampToValueAtTime(.0001,start+duration);
+      oscillator.connect(gain);gain.connect(voiceContext.destination);oscillator.start(start);oscillator.stop(start+duration+.01);
+      voiceNodes.push(oscillator);oscillator.onended=()=>{oscillator.disconnect();gain.disconnect();voiceNodes=voiceNodes.filter(node=>node!==oscillator);};
+    });
+  }
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)stopVoice();});
+  document.querySelector('#bgAudio').addEventListener('volumechange',()=>{if(document.querySelector('#bgAudio').muted)stopVoice();});
   const specs=[
     {kind:'byte',host:'.hero',color:palettes[0],hint:'Klik untuk menyapa · bisa digeser',words:['oh halo. nyari anak data? coba kenalan dulu.','sistem informasi. tertarik data sama AI. iya, masih belajar juga.','orangnya suka ngulik data. udah, biar proyeknya yang cerita.','boleh cek profil dulu. santai, ga ditanya balik kok.','kalau cocok, kabarin lewat kontak ya. masa pixel terus yang diajak ngobrol :(']},
     {kind:'data',host:'#projects',color:palettes[2],hint:'Klik untuk menyusun pixel · bisa digeser',words:['nah, ini proyeknya. klik aja, ada detailnya.','analisis data, ML, sama visualisasi. mau lihat yang mana dulu?','cek tujuan sama tools-nya juga ya. jangan salfok animasinya doang.','bentar. grafik bagus belum tentu jawab pertanyaannya.','udah sampai sini, masa cuma lewat :( buka satu dulu lah.']},
@@ -53,6 +78,7 @@
     function say(message){
       clearTimeout(timer);bubble.textContent=message;wrap.classList.add('is-speaking');
       placeBubble();
+      robotVoice(spec.kind);
       timer=setTimeout(()=>{wrap.classList.remove('is-speaking');if(messageSlot){messageSlot.classList.remove('is-visible');bubble.textContent='';}else{bubble.textContent='';}},Math.min(8500,Math.max(4500,message.length*65)));
     }
     function placeBubble(){
@@ -288,12 +314,12 @@
   // Three custom scene changes: diagonal pixels, checkerboard, and horizontal shutters.
   const curtain=document.createElement('div');
   curtain.className='pixel-transition';curtain.setAttribute('aria-hidden','true');
-  const cells=Array.from({length:72},(_,index)=>{
-    const cell=document.createElement('i');cell.style.background=palettes[Math.floor(index/12)%4];curtain.append(cell);return cell;
+  const cells=Array.from({length:160},(_,index)=>{
+    const cell=document.createElement('i');cell.style.background=index%17===0?'#3478ee':index%7===0?'#253842':'#152126';curtain.append(cell);return cell;
   });
   document.body.append(curtain);
   let transitioning=false;
-  const variants={home:'diagonal',profile:'checker',projects:'shutter',achievements:'diagonal',contact:'checker'};
+  const variants={home:'portal',profile:'scan',projects:'cascade',achievements:'spark',contact:'portal'};
   async function navigate(target,hash) {
     if(transitioning)return;
     transitioning=true;
@@ -308,17 +334,20 @@
     if(noMotion()){go();transitioning=false;return;}
     curtain.className='pixel-transition is-active '+type;
     const delay=index=>{
-      const col=index%12,row=Math.floor(index/12);
-      return type==='checker'?(col+row)%2*85:type==='shutter'?row*28:(col+row)*13;
+      const col=index%16,row=Math.floor(index/16),radius=Math.abs(col-7.5)+Math.abs(row-4.5);
+      if(type==='portal')return radius*17;
+      if(type==='scan')return col*12+(row%2)*24;
+      if(type==='cascade')return row*19+((col*7)%11)*12;
+      return ((index*37)%23)*10;
     };
-    const initial=type==='shutter'?'scaleX(0)':'scale(0)';
+    const initial=type==='cascade'?'translateY(-65%) scale(0)':type==='scan'?'scaleX(0)':'scale(0) rotate(90deg)';
     const animations=[];
     try {
-      const covers=cells.map((cell,index)=>cell.animate([{transform:initial},{transform:'scale(1.015)'}],{duration:170,delay:delay(index),fill:'both',easing:'steps(4,end)'}));
+      const covers=cells.map((cell,index)=>cell.animate([{transform:initial},{transform:'scale(1.025) rotate(0deg)'}],{duration:210,delay:delay(index),fill:'both',easing:'steps(4,end)'}));
       animations.push(...covers);
       await Promise.all(covers.map(animation=>animation.finished));
       go();
-      const reveals=cells.map((cell,index)=>cell.animate([{transform:'scale(1.015)'},{transform:initial}],{duration:210,delay:delay(71-index)*.7,fill:'both',easing:'steps(4,end)'}));
+      const reveals=cells.map((cell,index)=>cell.animate([{transform:'scale(1.025) rotate(0deg)'},{transform:initial}],{duration:210,delay:delay(159-index)*.7,fill:'both',easing:'steps(4,end)'}));
       animations.push(...reveals);
       await Promise.all(reveals.map(animation=>animation.finished));
     } finally {
