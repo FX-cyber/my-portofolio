@@ -125,6 +125,8 @@ main section[tabindex]:focus-visible{outline:none}
 .project-scroll-stage .scene-card{position:absolute;inset:0;min-height:0;border:0;border-top:10px solid var(--scene-color);background:var(--panel);box-shadow:0 -12px 24px #0002;z-index:calc(var(--scene-index) + 1);padding:clamp(32px,6vh,70px) 6%;translate:0 var(--panel-y,110%);scale:var(--panel-scale,1);rotate:x var(--panel-tilt,0deg);transition:none;overflow:hidden;transform-origin:50% 0}
 .project-scroll-stage .scene-card:first-child{--panel-y:0%}
 .project-scroll-stage .scene-card::after{content:attr(data-n);position:absolute;right:24px;top:18px;z-index:2;font:clamp(80px,12vw,180px)/1 'Press Start 2P';color:var(--scene-color);opacity:.9;pointer-events:none;text-shadow:8px 8px 0 color-mix(in srgb,var(--scene-color) 15%,transparent)}
+.project-scroll-stage .scene-card::after{content:none}
+.project-scroll-stage .card-number{position:absolute;right:24px;top:18px;z-index:3;font:clamp(80px,12vw,180px)/1 'Press Start 2P';color:var(--scene-color);opacity:.9;pointer-events:none;text-shadow:8px 8px 0 color-mix(in srgb,var(--scene-color) 15%,transparent)}
 .project-scroll-stage .scene-card::before{content:'';position:absolute;right:-30px;bottom:0;width:45%;height:45%;background:linear-gradient(90deg,transparent 95%,var(--panel) 95%),linear-gradient(transparent 95%,var(--panel) 95%),var(--scene-color);background-size:25px 25px;opacity:.13;clip-path:polygon(0 70%,20% 70%,20% 50%,40% 50%,40% 30%,60% 30%,60% 0,100% 0,100% 100%,0 100%);pointer-events:none}
 .project-scroll-stage .scene-card>svg{width:52px;height:52px;color:var(--scene-color)}
 .project-scroll-stage .scene-card h3{font-size:clamp(28px,3.5vw,48px);line-height:1.15;max-width:60%;margin:24px 0}
@@ -143,6 +145,7 @@ main section[tabindex]:focus-visible{outline:none}
 .scroll-scenes-off .project-scroll-stage .quest-grid{position:static;display:grid}
 .scroll-scenes-off .project-scroll-stage .scene-card{position:relative;inset:auto;translate:none;scale:1;rotate:none;border:1px solid var(--ink);padding:25px}
 .scroll-scenes-off .scene-card::before,.scroll-scenes-off .scene-controls,.scroll-scenes-off .scene-scroll-hint{display:none}
+.scroll-scenes-off .project-scroll-stage .card-number{position:absolute;right:18px;top:18px;font-size:52px;opacity:.2}
 .scroll-scenes-off .project-scroll-stage .scene-card h3,.scroll-scenes-off .project-scroll-stage .scene-card p,.scroll-scenes-off .project-scroll-stage .scene-card>div{max-width:none}
 .scroll-scenes-off .project-scroll-stage .scene-card h3{font-size:23px}
 .scroll-scenes-off .scroll-scene-divider{height:90px}
@@ -157,6 +160,7 @@ main section[tabindex]:focus-visible{outline:none}
 .project-scroll-stage .scene-card p{max-width:100%;font-size:15px}
 .project-scroll-stage .scene-card>div{max-width:100%}
 .project-scroll-stage .scene-card::after{font-size:60px;right:20px;top:18px;opacity:.22;z-index:2}
+.project-scroll-stage .card-number{font-size:60px;right:20px;top:18px;opacity:.22}
 .scene-controls{bottom:16px;right:15px;gap:5px}.scene-controls button{font-size:8px;padding:9px}
 .scene-scroll-hint{font-size:6px;left:22px;bottom:28px}
 .scene-cta{margin-top:18px}

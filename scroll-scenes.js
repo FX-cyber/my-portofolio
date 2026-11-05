@@ -13,6 +13,7 @@
     card.classList.add('scene-card');card.classList.remove('scroll-depth');
     card.style.setProperty('--scene-color',['var(--blue)','var(--green)','var(--red)','var(--blue)'][index%4]);
     card.style.setProperty('--scene-index',index);
+    const number=document.createElement('span');number.className='card-number';number.textContent='0'+(index+1);number.setAttribute('aria-hidden','true');card.append(number);
     const cta=document.createElement('span');cta.className='scene-cta';cta.textContent='BUKA DETAIL ↗';card.append(cta);
     const button=document.createElement('button');button.type='button';button.textContent='0'+(index+1);
     button.setAttribute('aria-label',card.dataset.title);button.addEventListener('click',()=>{
