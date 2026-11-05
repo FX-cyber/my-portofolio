@@ -77,6 +77,26 @@ main section[tabindex]:focus-visible{outline:none}
 .music-dancing .save-terminal{box-shadow:calc(8px + var(--music-energy,0) * 5px) calc(8px + var(--music-energy,0) * 5px) 0 var(--music-accent,var(--yellow));transition:box-shadow .2s}
 @media(max-width:760px){.companion-byte{left:18px;top:auto;bottom:18px;--roam-x:14px;--roam-y:7px}}
 
+/* Faster ambient motion keeps the companions visibly alive without making them chaotic. */
+.pixel-companion{animation-duration:9s}
+.companion-byte{animation-duration:10s}
+.companion-data{animation-duration:8s}
+.companion-spark{animation-duration:11s}
+
+/* Small pixel cue for interactive surfaces. */
+.quest-grid article,.certificate-card,.actions a,.contact a,.save-btn,.skills article,.project-thumbnails button{position:relative}
+.quest-grid article,.certificate-card{cursor:crosshair}
+.quest-grid article::after,.certificate-card::after,.actions a::after,.contact a::after,.save-btn::after,.skills article::after,.project-thumbnails button::after{content:'';position:absolute;width:5px;height:5px;right:9px;top:9px;background:var(--blue);opacity:0;transform:translate(4px,4px);transition:opacity .16s steps(2),transform .16s steps(2);pointer-events:none}
+.quest-grid article:hover::after,.certificate-card:hover::after,.actions a:hover::after,.contact a:hover::after,.save-btn:hover::after,.skills article:hover::after,.project-thumbnails button:hover::after{opacity:1;transform:none;box-shadow:-7px 7px 0 var(--yellow),-14px 14px 0 var(--red)}
+.quest-grid article:nth-child(2)::after{background:var(--green)}
+.quest-grid article:nth-child(3)::after{background:var(--red)}
+.certificate-card::after{background:var(--green)}
+.skills article:hover{transform:translateY(-3px);transition:transform .16s steps(2)}
+.actions a:hover,.contact a:hover,.save-btn:hover{cursor:pointer}
+.profile-photo>div,.learning-label{animation:status-blink 2.8s steps(2,end) infinite}
+@keyframes status-blink{0%,72%,100%{opacity:1}78%{opacity:.35}84%{opacity:1}}
+@media(prefers-reduced-motion:reduce){.pixel-companion{animation:none!important}.profile-photo>div,.learning-label{animation:none!important}.quest-grid article::after,.certificate-card::after,.actions a::after,.contact a::after,.save-btn::after,.skills article::after,.project-thumbnails button::after{transition:none}}
+
 /* Place Byte in the annotated gap between the name and portrait. */
 .companion-byte{left:47%;top:34%;bottom:auto;--roam-x:12px;--roam-y:12px}
 .music-party{position:fixed;inset:0;z-index:9;pointer-events:none;overflow:hidden}

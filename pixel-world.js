@@ -44,7 +44,7 @@
       const start=voiceContext.currentTime+index*settings.pace,duration=settings.pace*.72;
       oscillator.type=settings.type;oscillator.frequency.setValueAtTime(settings.base*note,start);
       oscillator.frequency.exponentialRampToValueAtTime(settings.base*note*.78,start+duration);
-      gain.gain.setValueAtTime(0,start);gain.gain.linearRampToValueAtTime(sound.volume*.13,start+.008);gain.gain.exponentialRampToValueAtTime(.0001,start+duration);
+      gain.gain.setValueAtTime(0,start);gain.gain.linearRampToValueAtTime(Math.min(.34,sound.volume*.28),start+.008);gain.gain.exponentialRampToValueAtTime(.0001,start+duration);
       oscillator.connect(gain);gain.connect(voiceContext.destination);oscillator.start(start);oscillator.stop(start+duration+.01);
       voiceNodes.push(oscillator);oscillator.onended=()=>{oscillator.disconnect();gain.disconnect();voiceNodes=voiceNodes.filter(node=>node!==oscillator);};
     });
