@@ -36,7 +36,7 @@
   function stopVoice(){voiceNodes.forEach(node=>{try{node.stop();}catch{}});voiceNodes=[];}
   function robotVoice(kind){
     const sound=document.querySelector('#bgAudio');
-    if(!voiceReady || document.hidden || sound.muted || sound.volume===0 || voiceContext.state!=='running')return;
+    if(!voiceReady || document.hidden || voiceContext.state!=='running')return;
     stopVoice();
     const settings={byte:{base:240,notes:[1,1.3,1.1,1.5,1],pace:.105,type:'triangle'},data:{base:145,notes:[1,1,1.25,1, .85],pace:.13,type:'square'},spark:{base:490,notes:[1,1.5,1.2,1.8,1.4,2],pace:.075,type:'triangle'}}[kind];
     settings.notes.forEach((note,index)=>{
@@ -44,7 +44,7 @@
       const start=voiceContext.currentTime+index*settings.pace,duration=settings.pace*.72;
       oscillator.type=settings.type;oscillator.frequency.setValueAtTime(settings.base*note,start);
       oscillator.frequency.exponentialRampToValueAtTime(settings.base*note*.78,start+duration);
-      gain.gain.setValueAtTime(0,start);gain.gain.linearRampToValueAtTime(Math.min(.34,sound.volume*.28),start+.008);gain.gain.exponentialRampToValueAtTime(.0001,start+duration);
+      gain.gain.setValueAtTime(0,start);gain.gain.linearRampToValueAtTime(Math.min(.42,Math.max(.24,sound.volume*.42)),start+.008);gain.gain.exponentialRampToValueAtTime(.0001,start+duration);
       oscillator.connect(gain);gain.connect(voiceContext.destination);oscillator.start(start);oscillator.stop(start+duration+.01);
       voiceNodes.push(oscillator);oscillator.onended=()=>{oscillator.disconnect();gain.disconnect();voiceNodes=voiceNodes.filter(node=>node!==oscillator);};
     });

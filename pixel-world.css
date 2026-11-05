@@ -142,7 +142,7 @@ main section[tabindex]:focus-visible{outline:none}
 .scroll-scenes-off .project-scroll-stage{position:relative;top:auto;height:auto;max-height:none;min-height:0;border:0;box-shadow:none;overflow:visible}
 .scroll-scenes-off .project-scroll-stage .quest-grid{position:static;display:grid}
 .scroll-scenes-off .project-scroll-stage .scene-card{position:relative;inset:auto;translate:none;scale:1;rotate:none;border:1px solid var(--ink);padding:25px}
-.scroll-scenes-off .scene-card::before,.scroll-scenes-off .scene-card::after,.scroll-scenes-off .scene-controls,.scroll-scenes-off .scene-scroll-hint{display:none}
+.scroll-scenes-off .scene-card::before,.scroll-scenes-off .scene-controls,.scroll-scenes-off .scene-scroll-hint{display:none}
 .scroll-scenes-off .project-scroll-stage .scene-card h3,.scroll-scenes-off .project-scroll-stage .scene-card p,.scroll-scenes-off .project-scroll-stage .scene-card>div{max-width:none}
 .scroll-scenes-off .project-scroll-stage .scene-card h3{font-size:23px}
 .scroll-scenes-off .scroll-scene-divider{height:90px}
