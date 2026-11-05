@@ -93,8 +93,8 @@ main section[tabindex]:focus-visible{outline:none}
 .certificate-card::after{background:var(--green)}
 .skills article:hover{transform:translateY(-3px);transition:transform .16s steps(2)}
 .actions a:hover,.contact a:hover,.save-btn:hover{cursor:pointer}
-.profile-photo>div,.learning-label{animation:status-blink 2.8s steps(2,end) infinite}
-@keyframes status-blink{0%,72%,100%{opacity:1}78%{opacity:.35}84%{opacity:1}}
+.profile-photo>div,.learning-label{animation:status-blink 5s steps(2,end) infinite}
+@keyframes status-blink{0%,78%,100%{opacity:1}82%{opacity:.62}86%{opacity:1}}
 @media(prefers-reduced-motion:reduce){.pixel-companion{animation:none!important}.profile-photo>div,.learning-label{animation:none!important}.quest-grid article::after,.certificate-card::after,.actions a::after,.contact a::after,.save-btn::after,.skills article::after,.project-thumbnails button::after{transition:none}}
 
 /* Place Byte in the annotated gap between the name and portrait. */
@@ -124,7 +124,7 @@ main section[tabindex]:focus-visible{outline:none}
 .project-scroll-stage .quest-grid{position:absolute;inset:0;display:block;perspective:1200px}
 .project-scroll-stage .scene-card{position:absolute;inset:0;min-height:0;border:0;border-top:10px solid var(--scene-color);background:var(--panel);box-shadow:0 -12px 24px #0002;z-index:calc(var(--scene-index) + 1);padding:clamp(32px,6vh,70px) 6%;translate:0 var(--panel-y,110%);scale:var(--panel-scale,1);rotate:x var(--panel-tilt,0deg);transition:none;overflow:hidden;transform-origin:50% 0}
 .project-scroll-stage .scene-card:first-child{--panel-y:0%}
-.project-scroll-stage .scene-card::after{content:attr(data-n);position:absolute;right:7%;top:27%;font:clamp(80px,12vw,180px) 'Press Start 2P';color:var(--scene-color);opacity:.9;pointer-events:none;text-shadow:8px 8px 0 color-mix(in srgb,var(--scene-color) 15%,transparent)}
+.project-scroll-stage .scene-card::after{content:attr(data-n);position:absolute;right:24px;top:18px;z-index:2;font:clamp(80px,12vw,180px)/1 'Press Start 2P';color:var(--scene-color);opacity:.9;pointer-events:none;text-shadow:8px 8px 0 color-mix(in srgb,var(--scene-color) 15%,transparent)}
 .project-scroll-stage .scene-card::before{content:'';position:absolute;right:-30px;bottom:0;width:45%;height:45%;background:linear-gradient(90deg,transparent 95%,var(--panel) 95%),linear-gradient(transparent 95%,var(--panel) 95%),var(--scene-color);background-size:25px 25px;opacity:.13;clip-path:polygon(0 70%,20% 70%,20% 50%,40% 50%,40% 30%,60% 30%,60% 0,100% 0,100% 100%,0 100%);pointer-events:none}
 .project-scroll-stage .scene-card>svg{width:52px;height:52px;color:var(--scene-color)}
 .project-scroll-stage .scene-card h3{font-size:clamp(28px,3.5vw,48px);line-height:1.15;max-width:60%;margin:24px 0}
@@ -156,7 +156,7 @@ main section[tabindex]:focus-visible{outline:none}
 .project-scroll-stage .scene-card h3{max-width:100%;font-size:30px;margin:20px 0}
 .project-scroll-stage .scene-card p{max-width:100%;font-size:15px}
 .project-scroll-stage .scene-card>div{max-width:100%}
-.project-scroll-stage .scene-card::after{font-size:60px;right:20px;top:20px;opacity:.13}
+.project-scroll-stage .scene-card::after{font-size:60px;right:20px;top:18px;opacity:.22;z-index:2}
 .scene-controls{bottom:16px;right:15px;gap:5px}.scene-controls button{font-size:8px;padding:9px}
 .scene-scroll-hint{font-size:6px;left:22px;bottom:28px}
 .scene-cta{margin-top:18px}

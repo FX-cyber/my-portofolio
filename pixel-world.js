@@ -27,9 +27,9 @@
     }
   }
   // Short synthesized robot chatter; unlocked by an actual visitor gesture.
-  let voiceContext, voiceReady=false, voiceNodes=[];
+  let voiceContext, voiceReady=false, voiceNodes=[],voiceQueue=[];
   function unlockVoice(){
-    try{voiceContext ??= new AudioContext();voiceContext.resume().then(()=>{voiceReady=true;}).catch(()=>{});}catch{}
+    try{voiceContext ??= new AudioContext();voiceContext.resume().then(()=>{voiceReady=true;const queue=voiceQueue.splice(0);queue.forEach((kind,index)=>setTimeout(()=>robotVoice(kind),index*650));}).catch(()=>{});}catch{}
   }
   window.addEventListener('pointerdown',unlockVoice,{passive:true});
   window.addEventListener('keydown',unlockVoice);
@@ -49,6 +49,7 @@
       voiceNodes.push(oscillator);oscillator.onended=()=>{oscillator.disconnect();gain.disconnect();voiceNodes=voiceNodes.filter(node=>node!==oscillator);};
     });
   }
+  function queueVoice(kind){if(voiceReady)robotVoice(kind);else if(!voiceQueue.includes(kind))voiceQueue.push(kind);}
   document.addEventListener('visibilitychange',()=>{if(document.hidden)stopVoice();});
   document.querySelector('#bgAudio').addEventListener('volumechange',()=>{if(document.querySelector('#bgAudio').muted)stopVoice();});
   const specs=[
@@ -78,7 +79,7 @@
     function say(message){
       clearTimeout(timer);bubble.textContent=message;wrap.classList.add('is-speaking');
       placeBubble();
-      robotVoice(spec.kind);
+      queueVoice(spec.kind);
       timer=setTimeout(()=>{wrap.classList.remove('is-speaking');if(messageSlot){messageSlot.classList.remove('is-visible');bubble.textContent='';}else{bubble.textContent='';}},Math.min(8500,Math.max(4500,message.length*65)));
     }
     function placeBubble(){
@@ -194,6 +195,7 @@
     });
     button.addEventListener('blur',()=>{if(!drag){cancel();reset();}});
     actors.push({
+      kind:spec.kind,
       wrap,
       speak:()=>{
         step++;
@@ -202,6 +204,15 @@
       reset:()=>{cancel();reset();}
     });
   });
+  // Each companion introduces itself once when it first enters the viewport.
+  const encounterObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{
+    if(!entry.isIntersecting||entry.target.dataset.encountered)return;
+    entry.target.dataset.encountered='true';
+    const actor=actors.find(item=>item.wrap===entry.target);
+    if(actor)setTimeout(()=>{if(!document.hidden&&!document.querySelector('dialog[open]'))actor.speak();},180);
+  }),{threshold:.55});
+  actors.forEach(actor=>encounterObserver.observe(actor.wrap));
+
   // One visible companion speaks after inactivity; never interrupt dialogs or another message.
   let idleTimer, idleTurn=0;
   function scheduleIdle(delay=11000){
